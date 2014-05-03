@@ -10,5 +10,12 @@ module CreditCard where
 -- []
 toDigits :: Integer -> [Integer]
 toDigits n
-  | n <= 0     = []
+  | n <= 0    = []
   | otherwise = toDigits (n `div` 10) ++ [n `mod` 10]
+
+-- | Convert an Integer to a reversed list of its digits.
+--
+-- >>> toDigitsRev 1234
+-- [4,3,2,1]
+toDigitsRev :: Integer -> [Integer]
+toDigitsRev = reverse . toDigits
