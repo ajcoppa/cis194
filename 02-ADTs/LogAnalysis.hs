@@ -89,3 +89,16 @@ insert _ _ = Leaf
 -- Leaf
 build :: [LogMessage] -> MessageTree
 build = foldr insert Leaf
+
+-- | Takes a sorted MessageTree and produces a list of all the LogMessages it
+-- contains, sorted by timestamp from smallest to biggest.
+--
+-- >>> inOrder Leaf
+-- []
+-- >>> inOrder $ Node (Node Leaf (LogMessage Info 1 "") Leaf) (LogMessage Info 2 "") Leaf
+-- [LogMessage Info 1 "",LogMessage Info 2 ""]
+-- >>> inOrder $ Node Leaf (LogMessage Info 2 "") (Node Leaf (LogMessage Info 3 "") Leaf)
+-- [LogMessage Info 2 "",LogMessage Info 3 ""]
+inOrder :: MessageTree -> [LogMessage]
+inOrder Leaf = []
+inOrder (Node l m r) = inOrder l ++ m : inOrder r
