@@ -60,3 +60,32 @@ parseWarningMessage ws =
 -- [LogMessage (Error 2) 562 "help help",LogMessage Info 29 "la la la"]
 parse :: String -> [LogMessage]
 parse = map parseMessage . lines
+
+-- | Returns a new MessageTree with the given LogMessage inserted into the
+-- correct sorted position.
+--
+-- >>> insert (Unknown "i'm an invalid message") Leaf
+-- Leaf
+-- >>> insert (LogMessage (Error 2) 562 "help help") Leaf
+-- Node Leaf (LogMessage (Error 2) 562 "help help") Leaf
+-- >>> insert (LogMessage Info 1 "") (Node Leaf (LogMessage Info 2 "") Leaf)
+-- Node (Node Leaf (LogMessage Info 1 "") Leaf) (LogMessage Info 2 "") Leaf
+-- >>> insert (LogMessage Info 3 "") (Node Leaf (LogMessage Info 2 "") Leaf)
+-- Node Leaf (LogMessage Info 2 "") (Node Leaf (LogMessage Info 3 "") Leaf)
+insert :: LogMessage -> MessageTree -> MessageTree
+insert (Unknown _) t = t
+insert m Leaf = Node Leaf m Leaf
+insert m@(LogMessage _ mStamp _) (Node l n@(LogMessage _ nStamp _) r) =
+  if mStamp < nStamp
+  then Node (insert m l) n r
+  else Node l n (insert m r)
+insert _ _ = Leaf
+
+-- | Builds a MessageTree from the given list of LogMessages.
+--
+-- >>> build [(LogMessage Info 1 ""), (LogMessage Info 2 "")]
+-- Node (Node Leaf (LogMessage Info 1 "") Leaf) (LogMessage Info 2 "") Leaf
+-- >>> build []
+-- Leaf
+build :: [LogMessage] -> MessageTree
+build = foldr insert Leaf
