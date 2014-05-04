@@ -37,3 +37,12 @@ doubleEveryOther xs = helper xs doubleFirstElement
 -- 22
 sumDigits :: [Integer] -> Integer
 sumDigits = sum . map sum . map toDigits
+
+-- | Validates a credit card number.
+--
+-- >>> validate 4012888888881881
+-- True
+-- >>> validate 4012888888881882
+-- False
+validate :: Integer -> Bool
+validate = (== 0) . (`mod` 10) . sumDigits . doubleEveryOther . toDigits
