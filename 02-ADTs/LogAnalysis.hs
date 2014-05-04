@@ -2,6 +2,7 @@
 module LogAnalysis where
 
 import Log
+import Control.Applicative
 
 -- | Parses an individual log line.
 --
@@ -102,3 +103,28 @@ build = foldr insert Leaf
 inOrder :: MessageTree -> [LogMessage]
 inOrder Leaf = []
 inOrder (Node l m r) = inOrder l ++ m : inOrder r
+
+-- | Returns a list of the messages corresponding to any errors with a severity
+-- of 50 or greater, sorted by timestamp.
+--
+-- >>> whatWentWrong []
+-- []
+-- >>> whatWentWrong [LogMessage (Error 49) 1 "a", LogMessage (Error 50) 2 "b", LogMessage (Error 51) 3 "c"]
+-- ["b","c"]
+-- >>> whatWentWrong [LogMessage Info 3 "a", Unknown "hi"]
+-- []
+whatWentWrong :: [LogMessage] -> [String]
+whatWentWrong [] = []
+whatWentWrong (LogMessage (Error sev) _ m : ms) =
+  if sev >= 50
+  then m : whatWentWrong ms
+  else whatWentWrong ms
+whatWentWrong (_:ms) = whatWentWrong ms
+
+whoDidIt :: IO [String]
+whoDidIt = map show . inOrder . build . parse <$> readFile "error.log"
+
+printWhoDidIt :: IO ()
+printWhoDidIt = do
+  ls <- whoDidIt
+  mapM_ putStrLn ls
