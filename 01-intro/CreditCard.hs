@@ -30,3 +30,10 @@ doubleEveryOther xs = helper xs doubleFirstElement
         helper [] _  = []
         helper (x:xs) True = x * 2 : helper xs False
         helper (x:xs) False = x : helper xs True
+
+-- | Sum up the digits of integers in a list.
+--
+-- >>> sumDigits [16,7,12,5]
+-- 22
+sumDigits :: [Integer] -> Integer
+sumDigits = sum . map sum . map toDigits
