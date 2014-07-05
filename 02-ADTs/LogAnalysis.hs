@@ -25,7 +25,7 @@ parseMessage m =
                              _ -> Unknown m
 
 -- | Parses an individual log line as an Error message.
--- 
+--
 -- >>> parseErrorMessage ["E","2","562","help","help"]
 -- LogMessage (Error 2) 562 "help help"
 parseErrorMessage :: [String] -> LogMessage
@@ -36,7 +36,7 @@ parseErrorMessage ws =
   in LogMessage (Error code) timestamp message
 
 -- | Parses an individual log line as an Info message.
--- 
+--
 -- >>> parseInfoMessage ["I","29","la","la","la"]
 -- LogMessage Info 29 "la la la"
 parseInfoMessage :: [String] -> LogMessage
@@ -46,7 +46,7 @@ parseInfoMessage ws =
   in LogMessage Info timestamp message
 
 -- | Parses an individual log line as a Warning message.
--- 
+--
 -- >>> parseWarningMessage ["W","5","Flange","is","due","for","a","check-up"]
 -- LogMessage Warning 5 "Flange is due for a check-up"
 parseWarningMessage :: [String] -> LogMessage
