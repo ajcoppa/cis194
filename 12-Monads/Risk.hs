@@ -144,7 +144,38 @@ sortByDescending = sortBy (flip compare)
 invade :: Battlefield -> Rand StdGen Battlefield
 invade battlefield =
   let battleOver :: Battlefield -> Bool
-      battleOver bf = (attackers bf <= 1) || (defenders bf <= 0)
+      battleOver bf = attackerWon bf || defenderWon bf
   in if battleOver battlefield
     then return battlefield
     else battle battlefield >>= invade
+
+{- | Returns true if the battlefield has no defenders.
+
+>>> attackerWon $ Battlefield {attackers = 4, defenders = 0}
+True
+
+>>> attackerWon $ Battlefield {attackers = 3, defenders = 1}
+False
+-}
+attackerWon :: Battlefield -> Bool
+attackerWon = (<= 0) . defenders
+
+{- | Returns true if the battlefield has 1 attacker or fewer.
+
+(Attackers have to leave 1 person behind, so they lose when they have 1
+attacker remaining.)
+
+>>> defenderWon $ Battlefield {attackers = 1, defenders = 4}
+True
+
+>>> defenderWon $ Battlefield {attackers = 3, defenders = 1}
+False
+-}
+defenderWon :: Battlefield -> Bool
+defenderWon = (<= 1) . attackers
+
+successProb :: Battlefield -> Rand StdGen Double
+successProb battlefield = do
+  resultBattlefields <- replicateM 1000 (invade battlefield)
+  return . (/ 1000.0) . fromIntegral . length . filter attackerWon
+    $ resultBattlefields
