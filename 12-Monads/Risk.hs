@@ -140,3 +140,11 @@ compareValues (attackRoll, defenseRoll) =
 -}
 sortByDescending :: Ord b => [b] -> [b]
 sortByDescending = sortBy (flip compare)
+
+invade :: Battlefield -> Rand StdGen Battlefield
+invade battlefield =
+  let battleOver :: Battlefield -> Bool
+      battleOver bf = (attackers bf <= 1) || (defenders bf <= 0)
+  in if battleOver battlefield
+    then return battlefield
+    else battle battlefield >>= invade
